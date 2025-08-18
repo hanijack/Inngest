@@ -28,7 +28,7 @@ export const userCreate = inngest.createFunction(
 )
 
 
-const userUpdate = inngest.createFunction({
+export const userUpdate = inngest.createFunction({
     id:"user-update",
 },
    { event:"clerk/user.updated"},
