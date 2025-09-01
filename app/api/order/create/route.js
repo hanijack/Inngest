@@ -9,7 +9,6 @@ import { NextResponse } from "next/server";
 
 
 export async function POST(request) {
-    await connectDB();
     try {
         const { userId } = getAuth(request);
         const { address , items } = await request.json();
@@ -21,9 +20,6 @@ export async function POST(request) {
             return (await acc) + product.price * item.quantity
         }, 0);
         
-        if(amount <=0){
-            return NextResponse.json({ success: false, error: "Amount must be greater than zero" });
-        }
         await inngest.send({
             name:"order/create",
             data:{
@@ -34,7 +30,8 @@ export async function POST(request) {
                 date:Date.now()
             }
         })
-
+        
+        await connectDB();
         const user = await User.findById(userId);
         user.cartItems = [];
         await user.save();
