@@ -1,6 +1,7 @@
 import User from '@/models/User';
 import {Inngest} from 'inngest';
 import {connectDB} from './db';
+import Order from '@/models/Order';
 
 export const inngest = new Inngest({id:"inngest-next"})
 
@@ -55,4 +56,29 @@ export const userDelete = inngest.createFunction(
         await User.findByIdAndDelete(id);
     }
 
+)
+
+export const creatOrder = inngest.createFunction({
+    id:"order-create",
+    batchEvents:{
+        maxSize:20,
+        timeout:"5s"
+    }
+},
+{event:"order/create"},
+async ({events}) => {
+    const orders = events.map(e => {
+        return {
+            user: e.data.userId,
+            items: e.data.items,
+            amount: e.data.amount,
+            address: e.data.address,
+            date:event.data.date,
+        }
+    });
+    await connectDB();
+    await Order.insertMany(orders);
+
+    return{ success:true , processed: orders.length}
+}
 )
