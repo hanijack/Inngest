@@ -41,7 +41,7 @@ export const userUpdate = inngest.createFunction({
             name: `${first_name} ${last_name}`,
             imageUrl: image_url ,
         }
-        await connectToDB();
+        await connectDB();
         await User.findByIdAndUpdate(id, user, {new:true});
    }
 )
@@ -52,16 +52,16 @@ export const userDelete = inngest.createFunction(
         event:"clerk/user.deleted"},
     async ({event}) => {
         const {id} = event.data;
-        await connectToDB();
+        await connectDB();
         await User.findByIdAndDelete(id);
     }
 
 )
 
-export const creatOrder = inngest.createFunction({
+export const createOrder = inngest.createFunction({
     id:"order-create",
     batchEvents:{
-        maxSize:20,
+        maxSize:5,
         timeout:"5s"
     }
 },
@@ -73,7 +73,7 @@ async ({events}) => {
             items: e.data.items,
             amount: e.data.amount,
             address: e.data.address,
-            date:event.data.date,
+            date:e.data.date,
         }
     });
     await connectDB();

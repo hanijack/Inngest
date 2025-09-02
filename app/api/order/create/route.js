@@ -1,11 +1,9 @@
 import { connectDB } from "@/config/db";
 import { inngest } from "@/config/inngest";
-import Address from "@/models/Address";
 import Product from "@/models/Product";
 import User from "@/models/User";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
 
 
 export async function POST(request) {
@@ -36,7 +34,6 @@ export async function POST(request) {
         user.cartItems = [];
         await user.save();
         return NextResponse.json({ success: true, message: "Order created successfully" });
-
     } catch (error) {
         NextResponse.json({ success: false, error: error.message });
     }

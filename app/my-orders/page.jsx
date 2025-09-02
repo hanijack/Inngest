@@ -6,22 +6,34 @@ import { useAppContext } from "@/context/AppContext";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
+import toast from "react-hot-toast";
 
 const MyOrders = () => {
 
-    const { currency } = useAppContext();
+    const { currency , getToken , user} = useAppContext();
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchOrders = async () => {
-        setOrders(orderDummyData)
+        try {
+            const token = await getToken()
+            const res = await fetch('/api/order/list', { headers: { Authorization: `Bearer ${token}` } });
+            const data = await res.json();
+            if (data.success) {
+                setOrders(data.orders);
+            }
+        } catch (error) {
+            toast.error(error.error);
+        }
         setLoading(false);
     }
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        if(user){
+            fetchOrders();
+        }
+    }, [user]);
 
     return (
         <>

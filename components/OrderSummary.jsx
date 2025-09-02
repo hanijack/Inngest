@@ -1,11 +1,11 @@
-import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const OrderSummary = () => {
 
-  const { currency, router, getCartCount, getCartAmount ,getToken , user , cartItems} = useAppContext()
+  const { currency, router, getCartCount, getCartAmount ,getToken , user , cartItems , setCartItems} = useAppContext()
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -35,7 +35,28 @@ const OrderSummary = () => {
   };
 
   const createOrder = async () => {
+    try {
+      if(!selectedAddress){
+        return toast.error("Please select an address")
+      }
+      let cartItemsArray = Object.keys(cartItems).map((key) =>({ product: key, quantity: cartItems[key] }));
+      cartItemsArray = cartItemsArray.filter(item => item.quantity > 0);
+      if(cartItemsArray.length ===0){
+        return toast.error("Your cart is empty")
+      }
+      const token = await getToken()
+      const {data}= await axios.post('/api/order/create' , {address: selectedAddress, items: cartItemsArray} , {headers: {Authorization: `Bearer ${token}`}})
+      if(data.success){
+        toast.success(data.message)
+        setCartItems= {}
+        router.push('/order-placed')
 
+      }else{
+        toast.error(data.error)
+      }
+    } catch (error) {
+      toast.error(error.error)
+    }
   }
 
   useEffect(() => {

@@ -11,7 +11,7 @@ export async function GET(request) {
     
     return NextResponse.json({ products, status: 200, success: true });
   } catch (error) {
-    return new NextResponse.json({ error: error.message, status: 404, success: false });
+    return  NextResponse.json({ error: error.message, status: 404, success: false });
   }
 
     
